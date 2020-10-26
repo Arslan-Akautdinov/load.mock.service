@@ -1,28 +1,71 @@
-from db.client_article import DBClientArticle, Article
-from flask import Response, request
-from app import app
+import sqlalchemy.exc
+import json
+import os
 
-db_article = DBClientArticle()
+from app import SWAGGER_DIR
+from app import app
+from flask import request, jsonify, make_response
+from flasgger import swag_from
+from db.client import db_session
+from db.models.article import Article
+
+
 base_headers = {"Content-Type": "application/json"}
 
 
 @app.route("/api/v1/article", methods=["GET"])
+@swag_from(os.path.join(SWAGGER_DIR, "get_article.yml"))
 def get_article():
-    return Response(db_article.select_article(), status=200, headers=base_headers)
+    try:
+        selected_articles: list = Article.query.all()
+        if len(selected_articles) != 0:
+            return make_response(json.dumps([article.get_dict() for article in selected_articles]), 200, base_headers)
+        else:
+            return make_response([], 200, base_headers)
+    except sqlalchemy.exc.IntegrityError as e:
+        return make_response(jsonify({"errors": e.args}), 422)
+    except Exception as e:
+        return make_response(jsonify({"errors": e}), 500)
 
 
 @app.route("/api/v1/article", methods=["POST"])
+@swag_from(os.path.join(SWAGGER_DIR, "add_article.yml"))
 def add_article():
-    request.get_json()
-    article = Article()
-    return Response(db_article.create_article(article), status=201, headers=base_headers)
+    try:
+        created_article = Article(**request.get_json())
+        db_session.add(created_article)
+        db_session.commit()
+        db_session.refresh(created_article)
+        return make_response(jsonify(created_article.get_dict()), 201)
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        return make_response(jsonify({"errors": e.args}), 422)
+    except Exception as e:
+        return make_response(jsonify({"errors": e}), 500)
 
 
 @app.route("/api/v1/article/<article_id>", methods=["GET"])
-def get_article_by_id(article_id):
-    return Response(db_article.select_article(article_id), status=200, headers=base_headers)
+@swag_from(os.path.join(SWAGGER_DIR, "get_article_by_id.yml"))
+def get_article_by_id(article_id: int):
+    try:
+        selected_article: Article = Article.query.filter_by(id=article_id).first()
+        if selected_article is not None:
+            return make_response(json.dumps(selected_article.get_dict()), 200, base_headers)
+        else:
+            return make_response(jsonify({"errors": "not found."}), 404, base_headers)
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        return make_response(jsonify({"errors": e.args}), 422)
+    except Exception as e:
+        return make_response(jsonify({"errors": e}), 500)
 
 
 @app.route("/api/v1/article/<article_id>", methods=["DELETE"])
-def del_article_by_id(article_id):
-    return Response(db_article.create_article(article_id), status=200, headers=base_headers)
+@swag_from(os.path.join(SWAGGER_DIR, "del_article.yml"))
+def del_article_by_id(article_id: int):
+    try:
+        Article.query.filter_by(id=article_id).delete()
+        db_session.commit()
+        return make_response({"message": "ok"}, 200)
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        return make_response(jsonify({"errors": e.args}), 422)
+    except Exception as e:
+        return make_response(jsonify({"errors": e}), 500)

@@ -1,0 +1,21 @@
+Удаление статьи
+---
+tags:
+  - Articles
+parameters:
+  - name: article_id
+    in: path
+    type: integer
+    required: true
+    description: Идентификатор статьи.
+responses:
+  422:
+    description: Неверные входные параметры
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Статья не найдена
+    schema:
+      $ref: '#/definitions/Error'
+  200:
+    description: Успех.
