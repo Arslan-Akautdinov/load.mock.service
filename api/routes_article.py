@@ -1,3 +1,6 @@
+from functools import wraps
+
+import jwt
 import sqlalchemy.exc
 import json
 import os
@@ -13,11 +16,25 @@ from db.models.article import Article
 base_headers = {"Content-Type": "application/json"}
 
 
+def check_for_token(headers):
+    if "token" not in headers:
+        return jsonify({"error": "Missing token"}), 403
+    try:
+        decoded = jwt.decode(headers["token"], app.config["SECRET_KEY"])
+        return {"user_id": decoded["user_id"]}
+    except Exception as ex:
+        return jsonify({"error": "Invalid token"}), 403
+
+
 @app.route("/api/v1/article", methods=["GET"])
 @swag_from(os.path.join(SWAGGER_DIR, "get_article.yml"))
 def get_article():
     try:
-        selected_articles: list = Article.query.all()
+        if "user_id" in check_for_token(request.headers):
+            user_id = check_for_token(request.headers)
+        else:
+            return check_for_token(request.headers)
+        selected_articles: list = Article.query.filter_by(author_id=user_id).all()
         if len(selected_articles) != 0:
             return make_response(json.dumps([article.get_dict() for article in selected_articles]), 200, base_headers)
         else:

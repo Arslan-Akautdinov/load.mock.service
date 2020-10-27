@@ -1,0 +1,25 @@
+Авторизация пользователя
+---
+tags:
+  - User
+parameters:
+  - name: user
+    in: body
+    required: true
+    schema:
+      $ref: '#/definitions/User'
+definitions:
+  Token:
+    type: object
+    properties:
+      token:
+        type: string
+responses:
+  422:
+    description: Неверные входные параметры
+    schema:
+      $ref: '#/definitions/Error'
+  201:
+    description: Успех.
+    schema:
+      $ref: '#/definitions/Token'

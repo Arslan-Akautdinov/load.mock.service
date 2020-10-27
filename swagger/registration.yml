@@ -1,0 +1,27 @@
+Регистрация пользователя
+---
+tags:
+  - User
+parameters:
+  - name: user
+    in: body
+    required: true
+    schema:
+      $ref: '#/definitions/User'
+definitions:
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+responses:
+  422:
+    description: Неверные входные параметры
+    schema:
+      $ref: '#/definitions/Error'
+  201:
+    description: Успех.
+    schema:
+      $ref: '#/definitions/Token'
