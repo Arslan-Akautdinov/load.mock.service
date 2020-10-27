@@ -1,0 +1,42 @@
+Получение конкретной статьи текущего пользователя по идентификатору
+---
+tags:
+  - Articles
+security:
+  - Token: []
+parameters:
+  - name: article_id
+    in: path
+    type: integer
+    required: true
+    description: Идентификатор статьи.
+definitions:
+  Article:
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      content:
+        type: string
+      author_id:
+        type: integer
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+responses:
+  422:
+    description: Неверные входные параметры
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Статья не найдена
+    schema:
+      $ref: '#/definitions/Error'
+  200:
+    description: Успех.
+    schema:
+      $ref: '#/definitions/Article'

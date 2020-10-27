@@ -8,6 +8,8 @@ parameters:
     type: integer
     required: true
     description: Идентификатор статьи.
+security:
+  - Token: []
 responses:
   422:
     description: Неверные входные параметры

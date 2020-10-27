@@ -1,0 +1,16 @@
+Получение списка статей текущего пользователя
+---
+tags:
+  - Articles
+security:
+  - Token: []
+definitions:
+  ArticleList:
+      type: array
+      items:
+        $ref: '#/definitions/Article'
+responses:
+  200:
+    description: Успех
+    schema:
+      $ref: '#/definitions/ArticleList'
