@@ -19,8 +19,13 @@ app.config['SWAGGER'] = {
     'description': "Данный сервис предназначен для проведения пробных нагрузочных тестов.",
     'uiversion': 3
 }
+
+DB_NAME = os.environ.get("POSTGRES_DB")
+DB_USER = os.environ.get("POSTGRES_USER")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+
 app.config["SECRET_KEY"] = "thisismysecretkey"
-app.config["DATABASE_URL"] = 'postgresql://admin:admin@127.0.0.1/lock_service'
+app.config["DATABASE_URL"] = f'postgresql://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}'
 swagger = Swagger(app, template=swagger_template)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SWAGGER_DIR = os.path.join(BASE_DIR, "swagger")
