@@ -26,8 +26,8 @@ def check_for_token(headers):
 @swag_from(os.path.join(SWAGGER_DIR, "get_article.yml"))
 def get_article():
     try:
-        selected_articles: list = Article.query.filter_by().all()
-        if len(selected_articles) != 0:
+        selected_articles = Article.query.filter_by().all()
+        if selected_articles is not None:
             return make_response(json.dumps([article.get_dict() for article in selected_articles]), 200, {"Content-Type": "application/json"})
         else:
             return make_response([], 200, {"Content-Type": "application/json"})
