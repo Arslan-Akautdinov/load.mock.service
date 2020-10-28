@@ -20,12 +20,13 @@ app.config['SWAGGER'] = {
     'uiversion': 3
 }
 
+DB_HOST = os.environ.get("POSTGRES_HOST_APP")
 DB_NAME = os.environ.get("POSTGRES_DB")
 DB_USER = os.environ.get("POSTGRES_USER")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 
 app.config["SECRET_KEY"] = "thisismysecretkey"
-app.config["DATABASE_URL"] = f'postgresql://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}'
+app.config["DATABASE_URL"] = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 swagger = Swagger(app, template=swagger_template)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SWAGGER_DIR = os.path.join(BASE_DIR, "swagger")
