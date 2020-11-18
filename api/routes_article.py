@@ -48,7 +48,7 @@ def get_article_author():
         selected_articles: list = Article.query.filter_by().all()
         if selected_articles is not None:
             result_list = [article for article in selected_articles if article.author_id == user_id]
-            return make_response(json.dumps([article.get_dict() for article in selected_articles]), 200, {"Content-Type": "application/json"})
+            return make_response(json.dumps([article.get_dict() for article in result_list]), 200, {"Content-Type": "application/json"})
         else:
             return make_response([], 200, {"Content-Type": "application/json"})
     except sqlalchemy.exc.IntegrityError as e:
