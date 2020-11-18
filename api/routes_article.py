@@ -46,7 +46,7 @@ def get_article_author():
         else:
             return check_for_token(request.headers)
         selected_articles: list = Article.query.filter_by(Article.author_id == user_id).all()
-        if len(selected_articles) != 0:
+        if selected_articles is not None:
             return make_response(json.dumps([article.get_dict() for article in selected_articles]), 200, {"Content-Type": "application/json"})
         else:
             return make_response([], 200, {"Content-Type": "application/json"})
